@@ -1,10 +1,6 @@
 #include "solve.h"
 #include "vector.h"
 
-#include <iostream>
-
-
-
 char* reverseString(const char* string,char length){
     auto tmp = (char*)malloc((length+1)*sizeof(char));
     if(!tmp)

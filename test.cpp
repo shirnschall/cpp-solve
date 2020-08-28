@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main(){
-    const char* testeq = "7/(3*1/5)-7";
+    const char* testeq = "7/(3*1/5)-7*13/(3-2*5)-13/(12-2/3)+15";
 
     Vector<float> test;
     *test.at(5)=7;
@@ -19,6 +19,6 @@ int main(){
     const char* t="5+(2-3)*15.7";
 
 
-    std::cout<<std::endl<<testeq<<std::endl<<"\t\t"<<solve(testeq,0,11)<<std::endl;
+    std::cout<<std::endl<<testeq<<std::endl<<"\t\t\t="<<solve(testeq,0,37)<<std::endl;
 
 }
