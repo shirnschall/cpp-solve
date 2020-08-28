@@ -1,4 +1,25 @@
 # cpp-solve
 Simple library to compute result of a calculation given as a string
 
-compile using C++11 or newer
+### Order of operations:
+* Brackets first
+* Multiplication and division before addition and subtraction
+* same priority operations are calculated from left to right
+
+
+### Build
+include solve.h in your project and call       
+```float solve(const char* eq,char start, char end)```.       
+Internally solve.h uses vector.h and vector.cpp so make sure to add them to your project!
+As the auto keyword is used you'll have to use C++11 or newer (or replace the auto keyword with the correct type).
+
+
+### Usage
+include solve.h in your project and call       
+```float solve(const char* eq,char start, char end)```.  
+start is the index of the first char that is part of your calculation and end is the first char index that is no longer part of your calculation.     
+E.g. if you want to solve "3*5+(2-3)*7" call:       
+```solve("3*5+(2-3)*7",0, 11)```.       
+
+In general: If the whole string is part of your calculation, start=0 and end=(length of your string)
+
