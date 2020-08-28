@@ -23,3 +23,9 @@ E.g. if you want to solve "3*5+(2-3)*7" call:
 
 In general: If the whole string is part of your calculation, start=0 and end=(length of your string)
 
+### Features
+- [x] Multiplication and division
+- [x] Addition and subtraction
+- [x] Brackets
+- [ ] Function (sin,cos,etc.)
+- [ ] Power (a^b)
