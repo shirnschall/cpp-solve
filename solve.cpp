@@ -1,6 +1,7 @@
 #include "solve.h"
 #include "vector.h"
 
+
 char* reverseString(const char* string,char length){
     auto tmp = (char*)malloc((length+1)*sizeof(char));
     if(!tmp)
@@ -60,8 +61,11 @@ float solve(const char* eq,char start,char end){
             {
                 return std::nanf("");
             }
-            else{
+            //these two extra cases are necessary because a calculation like a++--+b is valid and equal to a+b
+            else if(plusIndex.getLength()==0 || (plusIndex.getLength()>0 && numbers.getLength()-1!=*plusIndex.at(plusIndex.getLength()-1))){
                 plusIndex.push(numbers.getLength());
+            }
+            else{
             }
         }
         else if(eq[i] == '-')
@@ -77,6 +81,11 @@ float solve(const char* eq,char start,char end){
             }else if(i==end-1)
             {
                 return std::nanf("");
+            }
+            //these two extra cases are necessary because a calculation like a++--+b is valid and equal to a+b
+            else if(plusIndex.getLength()==0 || (plusIndex.getLength()>0 && numbers.getLength()-1!=*plusIndex.at(plusIndex.getLength()-1))){
+                *numbers.at(numbers.getLength()-1)*=-1;
+                plusIndex.push(numbers.getLength());
             }else{
                 *numbers.at(numbers.getLength()-1)*=-1;
             }
@@ -192,5 +201,6 @@ float solve(const char* eq,char start,char end){
         result+=*numbers.at(*plusIndex.at(i)-1);
     }
     free(tmp);
+
     return result;
 }
