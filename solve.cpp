@@ -95,6 +95,9 @@ float solve(const char* eq,char start,char end){
                 multIndex.push(numbers.push(strtof(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
+            }else if(i==end-1 || i==start)
+            {
+                return std::nanf("");
             }else{
                 multIndex.push(numbers.getLength());
             }
@@ -108,8 +111,12 @@ float solve(const char* eq,char start,char end){
                 multIndex.push(numbers.push((float)1/strtof(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
-            }else{
+            }else if(i==end-1 || i==start)
+            {
                 return std::nanf("");
+            }else{
+                (*numbers.at(numbers.getLength()-1)) = 1/(*numbers.at(numbers.getLength()-1));
+                multIndex.push(numbers.getLength());
             }
         }
         //if we find a bracket, try to find a matching one and call solve recursively
