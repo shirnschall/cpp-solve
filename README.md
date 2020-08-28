@@ -1,5 +1,9 @@
 # cpp-solve
+![build status](https://travis-ci.com/hirnschallsebastian/C-Calculator.svg?branch=master)
+![GitHub release](https://img.shields.io/badge/release-v0.1-blue.svg)
+
 Simple library to compute result of a calculation given as a string
+
 
 ### Order of operations:
 * Brackets first
