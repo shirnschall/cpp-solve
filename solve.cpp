@@ -8,7 +8,7 @@
 char* reverseString(const char* string,char length){
     auto tmp = (char*)malloc((length+1)*sizeof(char));
     if(!tmp)
-        return NULL;
+        return nullptr;
 
     tmp[length]='\0';
     for (int i = 0; i < length; ++i) {
@@ -56,7 +56,7 @@ float solve(const char* eq,char start,char end){
                 reversed=reverseString(tmp,tmpc);
                 if(!reversed)
                     return std::nanf("");
-                plusIndex.push(numbers.push(strtof(reversed,NULL)));
+                plusIndex.push(numbers.push(strtof(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
             }
@@ -75,7 +75,7 @@ float solve(const char* eq,char start,char end){
                 reversed=reverseString(tmp,tmpc);
                 if(!reversed)
                     return std::nanf("");
-                plusIndex.push(numbers.push(-strtof(reversed,NULL)));
+                plusIndex.push(numbers.push(-strtof(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
             }else if(i==end-1)
@@ -92,7 +92,7 @@ float solve(const char* eq,char start,char end){
                 reversed=reverseString(tmp,tmpc);
                 if(!reversed)
                     return std::nanf("");
-                multIndex.push(numbers.push(strtof(reversed,NULL)));
+                multIndex.push(numbers.push(strtof(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
             }else{
@@ -105,7 +105,7 @@ float solve(const char* eq,char start,char end){
                 reversed=reverseString(tmp,tmpc);
                 if(!reversed)
                     return std::nanf("");
-                multIndex.push(numbers.push((float)1/strtof(reversed,NULL)));
+                multIndex.push(numbers.push((float)1/strtof(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
             }else{
@@ -145,7 +145,7 @@ float solve(const char* eq,char start,char end){
         reversed=reverseString(tmp,tmpc);
         if(!reversed)
             return std::nanf("");
-        numbers.push(strtof(reversed,NULL));
+        numbers.push(strtof(reversed,nullptr));
         free(reversed);
         tmpc=0;
     }
@@ -156,6 +156,9 @@ float solve(const char* eq,char start,char end){
     //brackets first (already done in parsing)
     //mult and div before add and sub
     //equal priority operations from left to right
+    //we do not need to worry about the last point as we are replacing all divisions (a/b) with a*(1/b)
+    //and all subtractions (a+b) with (a+(-b))
+    //+ and * are commutative.
 
     //as we parsed eq from right to left, we have to go through the arrays from right to left
     //in to do calculations from left to right :)
@@ -176,9 +179,11 @@ float solve(const char* eq,char start,char end){
     }
 
     //we can now add the remaining numbers and return the result
-    //e.g. a+b*c+7
+    //Take a look at: a+b*c+d
     //based on the previous step we know that the result of b*c will be stored in b
     //we have to ignore c. this can be done using the value stored in the next plusIndex.
+    //we sum the first number and all numbers that are to the right of a + symbol.
+    //these numbers have an index of *plusIndex.at()-1
     float result=*numbers.at(numbers.getLength()-1);
     for (char i=0;i<plusIndex.getLength();++i){
         result+=*numbers.at(*plusIndex.at(i)-1);

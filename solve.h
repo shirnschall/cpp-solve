@@ -5,9 +5,9 @@
 
 
 
-float solve(const char* eq, char start, char end);
+float solve(const char* eq,char start,char end);
 
-char* reverseString(const char* string, char length);
+char* reverseString(const char* string,char length);
 
 
 #endif //SOLVE_SOLVE_H
