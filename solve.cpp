@@ -62,8 +62,9 @@ float solve(const char* eq,char start,char end){
                 return std::nanf("");
             }
             //these two extra cases are necessary because a calculation like a++--+b is valid and equal to a+b
-            else if(plusIndex.getLength()==0 || (plusIndex.getLength()>0 && numbers.getLength()-1!=*plusIndex.at(plusIndex.getLength()-1))){
-                plusIndex.push(numbers.getLength());
+            else if(plusIndex.size() == 0 || (plusIndex.size() > 0 && numbers.size() - 1 != *plusIndex.at(
+                    plusIndex.size() - 1))){
+                plusIndex.push(numbers.size());
             }
             else{
             }
@@ -83,11 +84,12 @@ float solve(const char* eq,char start,char end){
                 return std::nanf("");
             }
             //these two extra cases are necessary because a calculation like a++--+b is valid and equal to a+b
-            else if(plusIndex.getLength()==0 || (plusIndex.getLength()>0 && numbers.getLength()-1!=*plusIndex.at(plusIndex.getLength()-1))){
-                *numbers.at(numbers.getLength()-1)*=-1;
-                plusIndex.push(numbers.getLength());
+            else if(plusIndex.size() == 0 || (plusIndex.size() > 0 && numbers.size() - 1 != *plusIndex.at(
+                    plusIndex.size() - 1))){
+                *numbers.at(numbers.size() - 1)*=-1;
+                plusIndex.push(numbers.size());
             }else{
-                *numbers.at(numbers.getLength()-1)*=-1;
+                *numbers.at(numbers.size() - 1)*=-1;
             }
         }
         //check for multiplication
@@ -104,7 +106,7 @@ float solve(const char* eq,char start,char end){
             {
                 return std::nanf("");
             }else{
-                multIndex.push(numbers.getLength());
+                multIndex.push(numbers.size());
             }
         }
         else if(eq[i]=='/'){
@@ -120,8 +122,8 @@ float solve(const char* eq,char start,char end){
             {
                 return std::nanf("");
             }else{
-                (*numbers.at(numbers.getLength()-1)) = 1/(*numbers.at(numbers.getLength()-1));
-                multIndex.push(numbers.getLength());
+                (*numbers.at(numbers.size() - 1)) = 1 / (*numbers.at(numbers.size() - 1));
+                multIndex.push(numbers.size());
             }
         }
         //if we find a bracket, try to find a matching one and call solve recursively
@@ -181,10 +183,10 @@ float solve(const char* eq,char start,char end){
     //first the () was done in the parsing step so it is now a*e*d
     // we compute e*d=:f and replace e with the result f
     //this results in a*f*d. however we will ignore d and calculate a*f and replace a with the result.
-    if(multIndex.getLength()>0) {
-        for (char i = 0;i<multIndex.getLength() ;++i){
+    if(multIndex.size() > 0) {
+        for (char i = 0;i< multIndex.size() ; ++i){
             //check if '*' is associated with two numbers:
-            if(*multIndex.at(i)>=numbers.getLength())
+            if(*multIndex.at(i)>= numbers.size())
                 return std::nanf("");
             (*numbers.at(*multIndex.at(i))) *= (*numbers.at(*multIndex.at(i)-1));
         }
@@ -196,8 +198,8 @@ float solve(const char* eq,char start,char end){
     //we have to ignore c. this can be done using the value stored in the next plusIndex.
     //we sum the first number and all numbers that are to the right of a + symbol.
     //these numbers have an index of *plusIndex.at()-1
-    float result=*numbers.at(numbers.getLength()-1);
-    for (char i=0;i<plusIndex.getLength();++i){
+    float result=*numbers.at(numbers.size() - 1);
+    for (char i=0;i< plusIndex.size(); ++i){
         result+=*numbers.at(*plusIndex.at(i)-1);
     }
     free(tmp);

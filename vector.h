@@ -24,8 +24,8 @@ public:
     ~Vector();
     char resize(char size=0);
     T *at(int index);
-    char push(T value); //return index of element that was pushed
-    char getLength(); //return actual length of array
+    char push(T value); //return size() before adding new element (=index of new element)
+    char size(); //return number of elements in data array
 };
 
 
@@ -69,7 +69,7 @@ char Vector<T>::resize(char size) {
 }
 
 template <typename T>
-char Vector<T>::getLength() {
+char Vector<T>::size() {
     return currentIndex;
 }
 
