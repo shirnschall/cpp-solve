@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc libsolve.a  CMakeFiles/solve.dir/solve.cpp.o CMakeFiles/solve.dir/vector.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib libsolve.a
