@@ -168,7 +168,7 @@ float solve(const char* eq,char start,char end){
             }
 
         }
-        //if we find a bracket, try to find a matching one and call solve recursively
+        //if we find a closing bracket, try to find a matching opening bracket and call solve recursively
         else if(eq[i]==')'){
             //try to find a matching '(':
             char numClosingBrackets=0;
