@@ -24,7 +24,7 @@ public:
     ~Vector();
     char resize(char size=0);
     T *at(int index);
-    char push(T value); //return size() before adding new element (=index of new element)
+    char push(T value); //return size() after adding new element
     char size(); //return number of elements in data array
 };
 

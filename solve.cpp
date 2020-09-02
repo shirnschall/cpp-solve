@@ -1,6 +1,9 @@
 #include "solve.h"
 #include "vector.h"
 
+#include <cmath>
+
+#include <iostream>
 
 char* reverseString(const char* string,char length){
     auto tmp = (char*)malloc((length+1)*sizeof(char));
@@ -24,6 +27,7 @@ float solve(const char* eq,char start,char end){
     Vector<float> numbers;
     Vector<char> plusIndex;
     Vector<char> multIndex;
+    Vector<char> powIndex;
 
     auto tmp = (char*)malloc(MAX_NUMBER_LENGTH*sizeof(char));
     if(!tmp)
@@ -57,6 +61,7 @@ float solve(const char* eq,char start,char end){
                 free(reversed);
                 tmpc=0;
             }
+            //handling wrong or weird inputs
             else if(i==end-1)
             {
                 return std::nanf("");
@@ -65,8 +70,6 @@ float solve(const char* eq,char start,char end){
             else if(plusIndex.size() == 0 || (plusIndex.size() > 0 && numbers.size() - 1 != *plusIndex.at(
                     plusIndex.size() - 1))){
                 plusIndex.push(numbers.size());
-            }
-            else{
             }
         }
         else if(eq[i] == '-')
@@ -79,7 +82,9 @@ float solve(const char* eq,char start,char end){
                 plusIndex.push(numbers.push(-strtof(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
-            }else if(i==end-1)
+            }
+            //handling wrong or weird inputs
+            else if(i==end-1)
             {
                 return std::nanf("");
             }
@@ -146,9 +151,27 @@ float solve(const char* eq,char start,char end){
             }
             if(!foundMatching)
                 return std::nanf("");
+        }else if(eq[i]=='^'){
+            if(tmpc>0)
+            {
+                reversed=reverseString(tmp,tmpc);
+                if(!reversed)
+                    return std::nanf("");
+                multIndex.push(numbers.push(strtof(reversed,nullptr)));
+                powIndex.push(numbers.size());
+                free(reversed);
+                tmpc=0;
+            }else if(i==end-1 || i==start)
+            {
+                return std::nanf("");
+            }else{
+                multIndex.push(numbers.size());
+                powIndex.push(numbers.size());
+            }
+
         }
-        //we should never find a single opening bracket '('
-        else if(eq[i]=='('){
+        //we should never find a different char
+        else{
             return std::nanf("");
         }
     }
@@ -174,6 +197,20 @@ float solve(const char* eq,char start,char end){
     //and all subtractions (a+b) with (a+(-b))
     //+ and * are commutative.
 
+    if(numbers.size()==0)
+        return std::nanf("");
+
+    //we start with power a^b
+    if(powIndex.size() > 0) {
+        for (char i = powIndex.size()-1;i>=0; --i){
+            //check if '*' is associated with two numbers:
+            if(*powIndex.at(i)>= numbers.size())
+                return std::nanf("");
+            (*numbers.at(*powIndex.at(i)-1)) = pow((*numbers.at(*powIndex.at(i))),(*numbers.at(*powIndex.at(i)-1)));
+            (*numbers.at(*powIndex.at(i))) = 1;
+        }
+    }
+
     //as we parsed eq from right to left, we have to go through the arrays from right to left
     //in to do calculations from left to right :)
 
@@ -184,11 +221,11 @@ float solve(const char* eq,char start,char end){
     // we compute e*d=:f and replace e with the result f
     //this results in a*f*d. however we will ignore d and calculate a*f and replace a with the result.
     if(multIndex.size() > 0) {
-        for (char i = 0;i< multIndex.size() ; ++i){
+        for (char i = multIndex.size()-1;i>=0  ; --i){
             //check if '*' is associated with two numbers:
             if(*multIndex.at(i)>= numbers.size())
                 return std::nanf("");
-            (*numbers.at(*multIndex.at(i))) *= (*numbers.at(*multIndex.at(i)-1));
+            (*numbers.at(*multIndex.at(i)-1)) *= (*numbers.at(*multIndex.at(i)));
         }
     }
 
@@ -198,9 +235,9 @@ float solve(const char* eq,char start,char end){
     //we have to ignore c. this can be done using the value stored in the next plusIndex.
     //we sum the first number and all numbers that are to the right of a + symbol.
     //these numbers have an index of *plusIndex.at()-1
-    float result=*numbers.at(numbers.size() - 1);
+    float result=*numbers.at(0);
     for (char i=0;i< plusIndex.size(); ++i){
-        result+=*numbers.at(*plusIndex.at(i)-1);
+        result+=*numbers.at(*plusIndex.at(i));
     }
     free(tmp);
 
