@@ -32,5 +32,5 @@ In general: If the whole string is part of your calculation, start=0 and end=(le
 - [x] Addition and subtraction
 - [x] Brackets
 - [x] Correct order of operations (not like windows calc.exe o.O)
-- [ ] Function (sin,cos,etc.)
-- [ ] Power (a^b)
+- [x] Function (sin,cos,etc.)
+- [x] Power (a^b)
