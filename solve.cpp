@@ -67,7 +67,7 @@ float solve(const char* eq,char start,char end){
                 return std::nanf("");
             }
             //these two extra cases are necessary because a calculation like a++--+b is valid and equal to a+b
-            else if(plusIndex.size() == 0 || (plusIndex.size() > 0 && numbers.size() - 1 != *plusIndex.at(
+            else if(plusIndex.size() == 0 || (plusIndex.size() > 0 && numbers.size() != *plusIndex.at(
                     plusIndex.size() - 1))){
                 plusIndex.push(numbers.size());
             }
@@ -89,7 +89,7 @@ float solve(const char* eq,char start,char end){
                 return std::nanf("");
             }
             //these two extra cases are necessary because a calculation like a++--+b is valid and equal to a+b
-            else if(plusIndex.size() == 0 || (plusIndex.size() > 0 && numbers.size() - 1 != *plusIndex.at(
+            else if(plusIndex.size() == 0 || (plusIndex.size() > 0 && numbers.size()!= *plusIndex.at(
                     plusIndex.size() - 1))){
                 *numbers.at(numbers.size() - 1)*=-1;
                 plusIndex.push(numbers.size());
@@ -110,7 +110,13 @@ float solve(const char* eq,char start,char end){
             }else if(i==end-1 || i==start)
             {
                 return std::nanf("");
-            }else{
+            }
+            //this case is for a*-b. because - is pushed into the plusIndex array we need to remove it.
+            else if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()){
+                plusIndex.pop();
+                multIndex.push(numbers.size());
+            }
+            else{
                 multIndex.push(numbers.size());
             }
         }
@@ -126,10 +132,41 @@ float solve(const char* eq,char start,char end){
             }else if(i==end-1 || i==start)
             {
                 return std::nanf("");
+            }
+            //this case is for a/-b. because - is pushed into the plusIndex array we need to remove it.
+            else if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()){
+                std::cout<<(int)plusIndex.size()<<std::endl;
+                plusIndex.pop();
+                (*numbers.at(numbers.size() - 1)) = 1 / (*numbers.at(numbers.size() - 1));
+                multIndex.push(numbers.size());
             }else{
                 (*numbers.at(numbers.size() - 1)) = 1 / (*numbers.at(numbers.size() - 1));
                 multIndex.push(numbers.size());
             }
+        }else if(eq[i]=='^'){
+            if(tmpc>0)
+            {
+                reversed=reverseString(tmp,tmpc);
+                if(!reversed)
+                    return std::nanf("");
+                multIndex.push(numbers.push(strtof(reversed,nullptr)));
+                powIndex.push(numbers.size());
+                free(reversed);
+                tmpc=0;
+            }else if(i==end-1 || i==start)
+            {
+                return std::nanf("");
+            }//this case is for a/-b. because - is pushed into the plusIndex array we need to remove it.
+            else if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
+                plusIndex.pop();
+                multIndex.push(numbers.size());
+                powIndex.push(numbers.size());
+            }
+            else{
+                multIndex.push(numbers.size());
+                powIndex.push(numbers.size());
+            }
+
         }
         //if we find a bracket, try to find a matching one and call solve recursively
         else if(eq[i]==')'){
@@ -144,35 +181,37 @@ float solve(const char* eq,char start,char end){
                 else if(eq[j]=='(' && numClosingBrackets==0)
                 {
                     //matching '(' found
-                    numbers.push(solve(eq,j+1,i));
-                    i=j;//skip the part between () in parsing
-                    foundMatching=1;
+                    if(!foundMatching) {
+                        numbers.push(solve(eq, j + 1, i));
+                        i = j;//skip the part between () in parsing
+                        foundMatching = 1;
+                    }
                 }
             }
             if(!foundMatching)
                 return std::nanf("");
-        }else if(eq[i]=='^'){
-            if(tmpc>0)
-            {
-                reversed=reverseString(tmp,tmpc);
-                if(!reversed)
-                    return std::nanf("");
-                multIndex.push(numbers.push(strtof(reversed,nullptr)));
-                powIndex.push(numbers.size());
-                free(reversed);
-                tmpc=0;
-            }else if(i==end-1 || i==start)
-            {
-                return std::nanf("");
-            }else{
-                multIndex.push(numbers.size());
-                powIndex.push(numbers.size());
-            }
-
         }
-        //we should never find a different char
         else{
-            return std::nanf("");
+            //unary operators:
+            //trig functions work with rad not deg!
+            if(i>2 && eq[i]=='n' && eq[i-1]=='i' && eq[i-2]=='s' && eq[i-3]=='a'){
+                if(numbers.size())
+                    *numbers.at(numbers.size()-1) = asin(*numbers.at(numbers.size()-1));
+                i-=3;
+                if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
+                    plusIndex.pop();
+                }
+            }
+            else if(i>1 && eq[i]=='n' && eq[i-1]=='i' && eq[i-2]=='s'){
+                if(numbers.size())
+                    *numbers.at(numbers.size()-1) = sin(*numbers.at(numbers.size()-1));
+                i-=2;
+                if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
+                    plusIndex.pop();
+                }
+            }
+            else
+                return std::nanf("");
         }
     }
 
@@ -235,6 +274,7 @@ float solve(const char* eq,char start,char end){
     //we have to ignore c. this can be done using the value stored in the next plusIndex.
     //we sum the first number and all numbers that are to the right of a + symbol.
     //these numbers have an index of *plusIndex.at()-1
+
     float result=*numbers.at(0);
     for (char i=0;i< plusIndex.size(); ++i){
         result+=*numbers.at(*plusIndex.at(i));

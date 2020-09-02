@@ -25,6 +25,7 @@ public:
     char resize(char size=0);
     T *at(int index);
     char push(T value); //return size() after adding new element
+    char pop();
     char size(); //return number of elements in data array
 };
 
@@ -82,6 +83,14 @@ char Vector<T>::push(T value) {
 
     data[currentIndex]=value;
     return ++currentIndex;
+}
+
+template <typename T>
+char Vector<T>::pop() {
+    if(currentIndex>0) {
+        return --currentIndex;
+    }
+    return 0;
 }
 
 #endif //SOLVE_VECTOR_H
