@@ -210,6 +210,15 @@ float solve(const char* eq,char start,char end){
                     plusIndex.pop();
                 }
             }
+
+
+            //variables
+            else if(i>0 && eq[i]=='i' && eq[i-1]=='p'){
+                numbers.push(M_PI);
+                i-=1;
+            }else if(eq[i]=='e'){
+                numbers.push(M_E);
+            }
             else
                 return std::nanf("");
         }
