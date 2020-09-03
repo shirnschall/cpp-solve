@@ -17,7 +17,7 @@ char* reverseString(const char* string,char length){
     return tmp; //make sure to free the returned pointer
 }
 
-float solve(const char* eq,char start,char end){
+float solve(const char* eq,char start,char end, float ans){
     //check if eq is valid
     //if not, return NaN
     if(end<=start)
@@ -212,12 +212,15 @@ float solve(const char* eq,char start,char end){
             }
 
 
-            //variables
+            //constants
             else if(i>0 && eq[i]=='i' && eq[i-1]=='p'){
                 numbers.push(M_PI);
                 i-=1;
             }else if(eq[i]=='e'){
                 numbers.push(M_E);
+            }else if(i>1 && eq[i]=='s' && eq[i-1]=='n' && eq[i-2]=='a'){
+                numbers.push(ans);
+                i-=2;
             }
             else
                 return std::nanf("");

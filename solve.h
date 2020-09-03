@@ -5,7 +5,7 @@
 
 
 
-float solve(const char* eq,char start,char end);
+float solve(const char* eq,char start,char end,float ans = std::nanf(""));
 
 char* reverseString(const char* string,char length);
 
