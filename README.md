@@ -35,4 +35,4 @@ In general: If the whole string is part of your calculation, start=0 and end=(le
 - [x] Function (sin,cos,etc.)
 - [x] Power (a^b)
 - [x] Constants (pi,e, etc.)
-- [ ] variables
+- [x] variables (ans)
