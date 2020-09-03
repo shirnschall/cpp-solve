@@ -24,7 +24,7 @@ int main() {
     float ans = std::nanf("");
     while (1) {
         std::cin >> input;
-        ans = solve(input.c_str(), 0, input.length(),ans);
+        ans = solve(input.c_str(), 0, input.length(),&ans);
         std::cout << "\t\t\t=" << ans << "\n\n";
     }
 }

@@ -17,7 +17,7 @@ char* reverseString(const char* string,char length){
     return tmp; //make sure to free the returned pointer
 }
 
-float solve(const char* eq,char start,char end, float ans){
+float solve(const char* eq,char start,char end,const float* vars){
     //check if eq is valid
     //if not, return NaN
     if(end<=start)
@@ -182,7 +182,7 @@ float solve(const char* eq,char start,char end, float ans){
                 {
                     //matching '(' found
                     if(!foundMatching) {
-                        numbers.push(solve(eq, j + 1, i));
+                        numbers.push(solve(eq, j + 1, i,vars));
                         i = j;//skip the part between () in parsing
                         foundMatching = 1;
                     }
@@ -219,7 +219,10 @@ float solve(const char* eq,char start,char end, float ans){
             }else if(eq[i]=='e'){
                 numbers.push(M_E);
             }else if(i>1 && eq[i]=='s' && eq[i-1]=='n' && eq[i-2]=='a'){
-                numbers.push(ans);
+                if(vars)
+                    numbers.push(vars[0]);
+                else
+                    numbers.push(std::nanf(""));
                 i-=2;
             }
             else
