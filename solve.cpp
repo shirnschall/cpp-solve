@@ -3,8 +3,6 @@
 
 #include <cmath>
 
-#include <iostream>
-
 char* reverseString(const char* string,char length){
     auto tmp = (char*)malloc((length+1)*sizeof(char));
     if(!tmp)
@@ -135,7 +133,6 @@ float solve(const char* eq,char start,char end,const float* vars){
             }
             //this case is for a/-b. because - is pushed into the plusIndex array we need to remove it.
             else if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()){
-                std::cout<<(int)plusIndex.size()<<std::endl;
                 plusIndex.pop();
                 (*numbers.at(numbers.size() - 1)) = 1 / (*numbers.at(numbers.size() - 1));
                 multIndex.push(numbers.size());
