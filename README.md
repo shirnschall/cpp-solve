@@ -1,8 +1,8 @@
 # cpp-solve
 ![GitHub release](https://img.shields.io/badge/release-v0.1-blue.svg)
 
-Lightweight library to compute the result of a calculation given as an input string.
-You can find a detailed explanaition of the code at [my Blog](https://blog.hirnschall.net/programming-an-advanced-cpp-calculator/)
+Lightweight library to compute the result of a calculation given as an input string.         
+You can find a detailed explanaition of the code at [my Blog!](https://blog.hirnschall.net/programming-an-advanced-cpp-calculator/)
 
 
 ### Order of operations:
