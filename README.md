@@ -1,14 +1,16 @@
 # cpp-solve
-![build status](https://travis-ci.com/hirnschallsebastian/C-Calculator.svg?branch=master)
 ![GitHub release](https://img.shields.io/badge/release-v0.1-blue.svg)
 
-Simple library to compute result of a calculation given as a string
+Lightweight library to compute the result of a calculation given as an input string.         
+You can find a detailed explanaition of the code at [my Blog!](https://blog.hirnschall.net/programming-an-advanced-cpp-calculator/)
 
 
 ### Order of operations:
-* Brackets first
-* Multiplication and division before addition and subtraction
-* same priority operations are calculated from left to right
+1. Brackets first
+2. Exponentiation and root extraction
+3. Multiplication and division
+4. Addition and subtraction
+5. Same priority operations are calculated from left to right
 
 
 ### Build
