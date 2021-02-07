@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define DEFAULT_ARRAY_SIZE 10
 #define DEFAULT_INCREMENT DEFAULT_ARRAY_SIZE
@@ -27,8 +28,41 @@ public:
     char push(T value); //return size() after adding new element
     char pop();
     char size(); //return number of elements in data array
+    T* getData();
+    char insert(T value, char index);
+    char remove(char startIndex, char endIndex); //start and endindex will also be removed! return number of elements after removal
 };
 
+
+template <typename T>
+char Vector<T>::insert(T value, char index) {
+    if(currentIndex>=length) {
+        if (!resize(length + DEFAULT_INCREMENT))
+            return 0;
+    }
+
+    memmove(at(index+1),at(index),sizeof(T)*(currentIndex-index));
+
+    data[index]=value;
+    return ++currentIndex;
+}
+
+template<typename T>
+char Vector<T>::remove(char startIndex, char endIndex){
+    if(startIndex >=0 && startIndex<size() && endIndex>=startIndex && endIndex<size()){
+
+        //we do not overwrite values that have index greater than currentIndex! we memcpy all elements after endindex to starrtindex
+        memmove(at(startIndex),at(endIndex),sizeof(T)*(currentIndex-1-endIndex));
+
+        currentIndex -= (endIndex-startIndex)+1;//adjust number of elements counter
+    }
+    return currentIndex;
+}
+
+template<typename T>
+T* Vector<T>::getData(){
+    return data;
+}
 
 template<typename T>
 Vector<T>::Vector():currentIndex(0){
