@@ -1,7 +1,7 @@
 #include "solve.h"
 #include "vector.h"
 
-#include <cmath>
+#include <math.h>
 
 char* reverseString(const char* string,char length){
     auto tmp = (char*)malloc((length+1)*sizeof(char));
@@ -19,7 +19,7 @@ float solve(const char* eq,char start,char end,const float* vars){
     //check if eq is valid
     //if not, return NaN
     if(end<=start)
-        return std::nanf("");
+        return NAN;
 
     //create new arrays to store numbers and operators
     Vector<float> numbers;
@@ -29,7 +29,7 @@ float solve(const char* eq,char start,char end,const float* vars){
 
     auto tmp = (char*)malloc(MAX_NUMBER_LENGTH*sizeof(char));
     if(!tmp)
-        return std::nanf("");
+        return NAN;
     char tmpc=0;
     char* reversed;
 
@@ -41,7 +41,7 @@ float solve(const char* eq,char start,char end,const float* vars){
         if((eq[i]>47 && eq[i]<58) || eq[i]==46)
         {
             if(tmpc>=MAX_NUMBER_LENGTH)
-                return std::nanf("");
+                return NAN;
 
             tmp[tmpc++]=eq[i];
         }
@@ -54,15 +54,15 @@ float solve(const char* eq,char start,char end,const float* vars){
             {
                 reversed=reverseString(tmp,tmpc);
                 if(!reversed)
-                    return std::nanf("");
-                plusIndex.push(numbers.push(strtof(reversed,nullptr)));
+                    return NAN;
+                plusIndex.push(numbers.push(strtod(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
             }
             //handling wrong or weird inputs
             else if(i==end-1)
             {
-                return std::nanf("");
+                return NAN;
             }
             //these two extra cases are necessary because a calculation like a++--+b is valid and equal to a+b
             else if(plusIndex.size() == 0 || (plusIndex.size() > 0 && numbers.size() != *plusIndex.at(
@@ -76,15 +76,15 @@ float solve(const char* eq,char start,char end,const float* vars){
             {
                 reversed=reverseString(tmp,tmpc);
                 if(!reversed)
-                    return std::nanf("");
-                plusIndex.push(numbers.push(-strtof(reversed,nullptr)));
+                    return NAN;
+                plusIndex.push(numbers.push(-strtod(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
             }
             //handling wrong or weird inputs
             else if(i==end-1)
             {
-                return std::nanf("");
+                return NAN;
             }
             //these two extra cases are necessary because a calculation like a++--+b is valid and equal to a+b
             else if(plusIndex.size() == 0 || (plusIndex.size() > 0 && numbers.size()!= *plusIndex.at(
@@ -101,13 +101,13 @@ float solve(const char* eq,char start,char end,const float* vars){
             {
                 reversed=reverseString(tmp,tmpc);
                 if(!reversed)
-                    return std::nanf("");
-                multIndex.push(numbers.push(strtof(reversed,nullptr)));
+                    return NAN;
+                multIndex.push(numbers.push(strtod(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
             }else if(i==end-1 || i==start)
             {
-                return std::nanf("");
+                return NAN;
             }
             //this case is for a*-b. because - is pushed into the plusIndex array we need to remove it.
             else if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()){
@@ -123,13 +123,13 @@ float solve(const char* eq,char start,char end,const float* vars){
             {
                 reversed=reverseString(tmp,tmpc);
                 if(!reversed)
-                    return std::nanf("");
-                multIndex.push(numbers.push((float)1/strtof(reversed,nullptr)));
+                    return NAN;
+                multIndex.push(numbers.push((float)1/strtod(reversed,nullptr)));
                 free(reversed);
                 tmpc=0;
             }else if(i==end-1 || i==start)
             {
-                return std::nanf("");
+                return NAN;
             }
             //this case is for a/-b. because - is pushed into the plusIndex array we need to remove it.
             else if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()){
@@ -145,14 +145,14 @@ float solve(const char* eq,char start,char end,const float* vars){
             {
                 reversed=reverseString(tmp,tmpc);
                 if(!reversed)
-                    return std::nanf("");
-                multIndex.push(numbers.push(strtof(reversed,nullptr)));
+                    return NAN;
+                multIndex.push(numbers.push(strtod(reversed,nullptr)));
                 powIndex.push(numbers.size());
                 free(reversed);
                 tmpc=0;
             }else if(i==end-1 || i==start)
             {
-                return std::nanf("");
+                return NAN;
             }//this case is for a/-b. because - is pushed into the plusIndex array we need to remove it.
             else if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
                 plusIndex.pop();
@@ -186,7 +186,7 @@ float solve(const char* eq,char start,char end,const float* vars){
                 }
             }
             if(!foundMatching)
-                return std::nanf("");
+                return NAN;
         }
         else{
             //unary operators:
@@ -261,11 +261,11 @@ float solve(const char* eq,char start,char end,const float* vars){
                 if(vars)
                     numbers.push(vars[0]);
                 else
-                    numbers.push(std::nanf(""));
+                    numbers.push(NAN);
                 i-=2;
             }
             else
-                return std::nanf("");
+                return NAN;
         }
     }
 
@@ -274,8 +274,8 @@ float solve(const char* eq,char start,char end,const float* vars){
     {
         reversed=reverseString(tmp,tmpc);
         if(!reversed)
-            return std::nanf("");
-        numbers.push(strtof(reversed,nullptr));
+            return NAN;
+        numbers.push(strtod(reversed,nullptr));
         free(reversed);
         tmpc=0;
     }
@@ -291,14 +291,14 @@ float solve(const char* eq,char start,char end,const float* vars){
     //+ and * are commutative.
 
     if(numbers.size()==0)
-        return std::nanf("");
+        return NAN;
 
     //we start with power a^b
     if(powIndex.size() > 0) {
         for (char i = powIndex.size()-1;i>=0; --i){
             //check if '*' is associated with two numbers:
             if(*powIndex.at(i)>= numbers.size())
-                return std::nanf("");
+                return NAN;
             (*numbers.at(*powIndex.at(i)-1)) = pow((*numbers.at(*powIndex.at(i))),(*numbers.at(*powIndex.at(i)-1)));
             (*numbers.at(*powIndex.at(i))) = 1;
         }
@@ -317,7 +317,7 @@ float solve(const char* eq,char start,char end,const float* vars){
         for (char i = multIndex.size()-1;i>=0  ; --i){
             //check if '*' is associated with two numbers:
             if(*multIndex.at(i)>= numbers.size())
-                return std::nanf("");
+                return NAN;
             (*numbers.at(*multIndex.at(i)-1)) *= (*numbers.at(*multIndex.at(i)));
         }
     }

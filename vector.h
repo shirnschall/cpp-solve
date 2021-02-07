@@ -6,8 +6,8 @@
 #define SOLVE_VECTOR_H
 
 
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define DEFAULT_ARRAY_SIZE 10
 #define DEFAULT_INCREMENT DEFAULT_ARRAY_SIZE

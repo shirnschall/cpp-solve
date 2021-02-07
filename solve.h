@@ -1,7 +1,7 @@
 #ifndef SOLVE_SOLVE_H
 #define SOLVE_SOLVE_H
 
-#include <cmath>
+#include <math.h>
 
 
 
