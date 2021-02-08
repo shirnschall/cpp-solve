@@ -11,7 +11,7 @@
 #include <string.h>
 
 #define DEFAULT_ARRAY_SIZE 10
-#define DEFAULT_INCREMENT DEFAULT_ARRAY_SIZE
+#define DEFAULT_INCREMENT 10
 #define MAX_NUMBER_LENGTH 10
 
 template<typename T>
@@ -31,8 +31,27 @@ public:
     T* getData();
     char insert(T value, char index);
     char remove(char startIndex, char endIndex); //start and endindex will also be removed! return number of elements after removal
+    char clear();
 };
 
+template <typename T>
+char Vector<T>::clear() {
+    currentIndex=0;
+    //check if array exists. if not use malloc
+    if(!data)
+    {
+        data = (T*)malloc(DEFAULT_ARRAY_SIZE*sizeof(T));
+    }else{
+        data = (T*)realloc(data,DEFAULT_ARRAY_SIZE*sizeof(T));
+    }
+    if(!data) {
+        length = 0;
+        return 0;
+    }else {
+        length = DEFAULT_ARRAY_SIZE;
+        return length;
+    }
+}
 
 template <typename T>
 char Vector<T>::insert(T value, char index) {
@@ -40,10 +59,13 @@ char Vector<T>::insert(T value, char index) {
         if (!resize(length + DEFAULT_INCREMENT))
             return 0;
     }
+    if(index!=currentIndex && index >=0 && index <currentIndex)
+    {
+        memmove(at(index+1),at(index),sizeof(T)*(currentIndex-index));
+        data[index]=value;
+    }else if(index == currentIndex)
+        data[index]=value;
 
-    memmove(at(index+1),at(index),sizeof(T)*(currentIndex-index));
-
-    data[index]=value;
     return ++currentIndex;
 }
 
@@ -84,12 +106,10 @@ T * Vector<T>::at(int index) {
 }
 template<typename T>
 char Vector<T>::resize(char size) {
-    if(size==-1)
-        size=DEFAULT_ARRAY_SIZE;
     //check if array exists. if not use malloc
     if(!data)
     {
-        data = (T*)malloc(size*sizeof(T));
+        data = (T*)malloc(DEFAULT_ARRAY_SIZE*sizeof(T));
     }else{
         data = (T*)realloc(data,size*sizeof(T));
     }
@@ -100,7 +120,6 @@ char Vector<T>::resize(char size) {
         length = size;
         return size;
     }
-
 }
 
 template <typename T>
