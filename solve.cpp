@@ -1,6 +1,8 @@
 #include "solve.h"
 #include "vector.h"
 
+#include <equation.h>
+
 #include <math.h>
 
 char* reverseString(const char* string,char length){
@@ -15,7 +17,7 @@ char* reverseString(const char* string,char length){
     return tmp; //make sure to free the returned pointer
 }
 
-float solve(const char* eq,char start,char end,const float* vars){
+float solve(const Equation* eq,char start,char end,const float* vars){
     //check if eq is valid
     //if not, return NaN
     if(end<=start)
@@ -27,7 +29,7 @@ float solve(const char* eq,char start,char end,const float* vars){
     Vector<char> multIndex;
     Vector<char> powIndex;
 
-    auto tmp = (char*)malloc(MAX_NUMBER_LENGTH*sizeof(char));
+    char tmp[MAX_NUMBER_LENGTH];
     if(!tmp)
         return NAN;
     char tmpc=0;
@@ -37,18 +39,21 @@ float solve(const char* eq,char start,char end,const float* vars){
     //parsing from right to left allows us to
     //e.g. multiply the number to the right of binary operators with -1 for subtraction
     for (char i = end-1; i >= start; --i) {
-        //check if current char is number or decimalpoint '.' using ascii
-        if((eq[i]>47 && eq[i]<58) || eq[i]==46)
+        //check if current char is number or decimalpoint '.'
+        if((eq->at(i)->i == 2 && (eq->at(i)->j == 1 ||eq->at(i)->j == 2 ||eq->at(i)->j == 3)) ||
+                (eq->at(i)->i == 3 && (eq->at(i)->j == 1 ||eq->at(i)->j == 2 ||eq->at(i)->j == 3)) ||
+                (eq->at(i)->i == 4 && (eq->at(i)->j == 1 ||eq->at(i)->j == 2 ||eq->at(i)->j == 3)) ||
+                (eq->at(i)->i == 5 && (eq->at(i)->j == 1 ||eq->at(i)->j == 2 )))
         {
             if(tmpc>=MAX_NUMBER_LENGTH)
                 return NAN;
 
-            tmp[tmpc++]=eq[i];
+            tmp[tmpc++]=eq->at(i)->text[0];
         }
         //if current char is + or - add tmp to numbers array if it is not empty
         //if it is empty: ignore if current char is '+' and mult the last number in numbers with -1 if it is '-'.
         //->do not add to plusIndex array
-        else if(eq[i] == '+')
+        else if(eq->at(i)->i == 4 && eq->at(i)->j == 4) // +
         {
             if(tmpc>0)
             {
@@ -70,7 +75,7 @@ float solve(const char* eq,char start,char end,const float* vars){
                 plusIndex.push(numbers.size());
             }
         }
-        else if(eq[i] == '-')
+        else if(eq->at(i)->i == 3 && eq->at(i)->j == 4) // -
         {
             if(tmpc>0)
             {
@@ -96,7 +101,7 @@ float solve(const char* eq,char start,char end,const float* vars){
             }
         }
         //check for multiplication
-        else if(eq[i]=='*'){
+        else if(eq->at(i)->i == 2 && eq->at(i)->j == 4){ //*
             if(tmpc>0)
             {
                 reversed=reverseString(tmp,tmpc);
@@ -118,7 +123,7 @@ float solve(const char* eq,char start,char end,const float* vars){
                 multIndex.push(numbers.size());
             }
         }
-        else if(eq[i]=='/'){
+        else if(eq->at(i)->i == 1 && eq->at(i)->j == 4){ // /
             if(tmpc>0)
             {
                 reversed=reverseString(tmp,tmpc);
@@ -140,7 +145,7 @@ float solve(const char* eq,char start,char end,const float* vars){
                 (*numbers.at(numbers.size() - 1)) = 1 / (*numbers.at(numbers.size() - 1));
                 multIndex.push(numbers.size());
             }
-        }else if(eq[i]=='^'){
+        }else if(eq->at(i)->i == 1 && eq->at(i)->j == 1 && eq->at(i)->z == 0){ // ^
             if(tmpc>0)
             {
                 reversed=reverseString(tmp,tmpc);
@@ -166,21 +171,37 @@ float solve(const char* eq,char start,char end,const float* vars){
 
         }
         //if we find a closing bracket, try to find a matching opening bracket and call solve recursively
-        else if(eq[i]==')'){
+        //here we have to count all operators like "sin(" as a open bracket..
+        else if(eq->at(i)->i == 1 && eq->at(i)->j == 3){ // )
             //try to find a matching '(':
             char numClosingBrackets=0;
             char foundMatching=0;
             for(char j=i-1;j>=start;--j){
-                if(eq[j]==')')
+                if(eq->at(j)->i == 1 && eq->at(j)->j == 3)      // )
                     ++numClosingBrackets;
-                else if(eq[j]=='(' && numClosingBrackets>0)
+                else if(((eq->at(j)->i == 1 && eq->at(j)->j == 2) ||    // (
+                         (eq->at(j)->i == 0 && eq->at(j)->j == 0) ||    //sin,asin,...
+                         (eq->at(j)->i == 0 && eq->at(j)->j == 1) ||    //cos,acos,...
+                         (eq->at(j)->i == 0 && eq->at(j)->j == 2) ||    //tan,atan,...
+                         (eq->at(j)->i == 2 && eq->at(j)->j == 0) ||    //ln,log
+                         (eq->at(j)->i == 1 && eq->at(j)->j == 1 && eq->at(j)->z == 1))   //sqrt
+                            && numClosingBrackets>0)
                     --numClosingBrackets;
-                else if(eq[j]=='(' && numClosingBrackets==0)
+                else if(((eq->at(j)->i == 1 && eq->at(j)->j == 2) ||    // (
+                         (eq->at(j)->i == 0 && eq->at(j)->j == 0) ||    //sin,asin,...
+                         (eq->at(j)->i == 0 && eq->at(j)->j == 1) ||    //cos,acos,...
+                         (eq->at(j)->i == 0 && eq->at(j)->j == 2) ||    //tan,atan,...
+                         (eq->at(j)->i == 2 && eq->at(j)->j == 0) ||    //ln,log
+                         (eq->at(j)->i == 1 && eq->at(j)->j == 1 && eq->at(j)->z == 1))   //sqrt
+                         && numClosingBrackets==0)    // (,sin,...
                 {
                     //matching '(' found
                     if(!foundMatching) {
                         numbers.push(solve(eq, j + 1, i,vars));
-                        i = j;//skip the part between () in parsing
+                        if(eq->at(j)->i == 1 && eq->at(j)->j == 2) // (
+                            i = j;//skip the part between () in parsing
+                        else    //sin,cos,...
+                            i = j+1;//if sin etc is ( we do not want to skip the operator -> j+1
                         foundMatching = 1;
                     }
                 }
@@ -191,60 +212,52 @@ float solve(const char* eq,char start,char end,const float* vars){
         else{
             //unary operators:
             //trig functions work with rad not deg!
-            if(i>2 && eq[i]=='n' && eq[i-1]=='i' && eq[i-2]=='s' && eq[i-3]=='a'){
+            if(eq->at(i)->i == 0 && eq->at(i)->j == 0 && eq->at(i)->z == 1){    // asin
                 if(numbers.size())
                     *numbers.at(numbers.size()-1) = asin(*numbers.at(numbers.size()-1));
-                i-=3;
                 if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
                     plusIndex.pop();
                 }
             }
-            else if(i>1 && eq[i]=='n' && eq[i-1]=='i' && eq[i-2]=='s'){
+            else if(eq->at(i)->i == 0 && eq->at(i)->j == 0 && eq->at(i)->z == 0){   // sin
                 if(numbers.size())
                     *numbers.at(numbers.size()-1) = sin(*numbers.at(numbers.size()-1));
-                i-=2;
                 if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
                     plusIndex.pop();
                 }
-            }else if(i>2 && eq[i]=='s' && eq[i-1]=='o' && eq[i-2]=='c' && eq[i-3]=='a'){
+            }else if(eq->at(i)->i == 0 && eq->at(i)->j == 1 && eq->at(i)->z == 1){  //acos
                 if(numbers.size())
                     *numbers.at(numbers.size()-1) = acos(*numbers.at(numbers.size()-1));
-                i-=3;
                 if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
                     plusIndex.pop();
                 }
-            }else if(i>1 && eq[i]=='s' && eq[i-1]=='o' && eq[i-2]=='c'){
+            }else if(eq->at(i)->i == 0 && eq->at(i)->j == 1 && eq->at(i)->z == 0){  //cos
                 if(numbers.size())
                     *numbers.at(numbers.size()-1) = cos(*numbers.at(numbers.size()-1));
-                i-=2;
                 if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
                     plusIndex.pop();
                 }
-            }else if(i>2 && eq[i]=='n' && eq[i-1]=='a' && eq[i-2]=='t' && eq[i-3]=='a'){
+            }else if(eq->at(i)->i == 0 && eq->at(i)->j == 2 && eq->at(i)->z == 1){  //atan
                 if(numbers.size())
                     *numbers.at(numbers.size()-1) = atan(*numbers.at(numbers.size()-1));
-                i-=3;
                 if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
                     plusIndex.pop();
                 }
-            }else if(i>1 && eq[i]=='n' && eq[i-1]=='a' && eq[i-2]=='t'){
+            }else if(eq->at(i)->i == 0 && eq->at(i)->j == 2 && eq->at(i)->z == 0){  //tan
                 if(numbers.size())
                     *numbers.at(numbers.size()-1) = tan(*numbers.at(numbers.size()-1));
-                i-=2;
                 if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
                     plusIndex.pop();
                 }
-            }else if(i>0 && eq[i]=='n' && eq[i-1]=='l'){
+            }else if(eq->at(i)->i == 2 && eq->at(i)->j == 0 && eq->at(i)->z == 0){  //ln
                 if(numbers.size())
                     *numbers.at(numbers.size()-1) = log(*numbers.at(numbers.size()-1));
-                i-=3;
                 if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
                     plusIndex.pop();
                 }
-            }else if(i>1 && eq[i]=='g' && eq[i-1]=='o' && eq[i-2]=='l'){
+            }else if(eq->at(i)->i == 2 && eq->at(i)->j == 0 && eq->at(i)->z == 1){  //log
                 if(numbers.size())
                     *numbers.at(numbers.size()-1) = log10(*numbers.at(numbers.size()-1));
-                i-=2;
                 if(plusIndex.size()>0 && *plusIndex.at(plusIndex.size()-1) == numbers.size()) {
                     plusIndex.pop();
                 }
@@ -252,17 +265,15 @@ float solve(const char* eq,char start,char end,const float* vars){
 
 
             //constants
-            else if(i>0 && eq[i]=='i' && eq[i-1]=='p'){
+            else if(eq->at(i)->i == 3 && eq->at(i)->j == 0 && eq->at(i)->z == 0){   //pi
                 numbers.push(M_PI);
-                i-=1;
-            }else if(eq[i]=='e'){
+            }else if(eq->at(i)->i == 3 && eq->at(i)->j == 0 && eq->at(i)->z == 1){   //e
                 numbers.push(M_E);
-            }else if(i>1 && eq[i]=='s' && eq[i-1]=='n' && eq[i-2]=='a'){
+            }else if(eq->at(i)->i == 5 && eq->at(i)->j == 0 && eq->at(i)->z == 0){    //ans
                 if(vars)
                     numbers.push(vars[0]);
                 else
                     numbers.push(NAN);
-                i-=2;
             }
             else
                 return NAN;
@@ -297,7 +308,7 @@ float solve(const char* eq,char start,char end,const float* vars){
     if(powIndex.size() > 0) {
         for (char i = powIndex.size()-1;i>=0; --i){
             //check if '*' is associated with two numbers:
-            if(*powIndex.at(i)>= numbers.size())
+            if(*powIndex.at(i)>= numbers.size()|| *powIndex.at(i) == 0)
                 return NAN;
             (*numbers.at(*powIndex.at(i)-1)) = pow((*numbers.at(*powIndex.at(i))),(*numbers.at(*powIndex.at(i)-1)));
             (*numbers.at(*powIndex.at(i))) = 1;
@@ -316,7 +327,7 @@ float solve(const char* eq,char start,char end,const float* vars){
     if(multIndex.size() > 0) {
         for (char i = multIndex.size()-1;i>=0  ; --i){
             //check if '*' is associated with two numbers:
-            if(*multIndex.at(i)>= numbers.size())
+            if(*multIndex.at(i)>= numbers.size() || *multIndex.at(i) == 0)
                 return NAN;
             (*numbers.at(*multIndex.at(i)-1)) *= (*numbers.at(*multIndex.at(i)));
         }
@@ -335,7 +346,6 @@ float solve(const char* eq,char start,char end,const float* vars){
             result += *numbers.at(*plusIndex.at(i));
         }
     }
-    free(tmp);
 
     return result;
 }
